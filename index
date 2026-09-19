@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merch Store Wireframe (iBox-style)</title>
+<style>
+:root{
+  --page:#ffffff; --frame:#ffffff; color-scheme:light; --ink:#1d1d1f; --mute:#6b6b70; --line:#c9c9ce;
+  --block:#dcdce1; --block2:#ececf0; --accent:#1d1d1f; --note:#e8590c; --note-bg:#fff4e6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.45}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+:focus-visible{outline:2px solid var(--note);outline-offset:2px}
+
+.toolbar{position:sticky;top:0;z-index:50;background:var(--page);border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:flex-end;padding:10px 16px}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{padding:6px 12px;font-size:13px;background:var(--frame)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--frame)}
+.seg button+button{border-left:1px solid var(--line)}
+
+.stage{padding:20px 12px 60px;display:flex;justify-content:center}
+.frame{width:100%;max-width:1200px;background:var(--frame);border:1px solid var(--line);border-radius:10px;overflow:hidden;transition:max-width .25s}
+.stage[data-vp="mobile"] .frame{max-width:390px}
+
+/* placeholders */
+.ph{background:var(--block);border-radius:6px;position:relative;overflow:hidden}
+.ph.x::before,.ph.x::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(to top right,transparent calc(50% - .5px),var(--line) 50%,transparent calc(50% + .5px))}
+.ph.x::after{transform:scaleX(-1)}
+.line{height:9px;background:var(--block);border-radius:4px}
+.line.s{width:40%}.line.m{width:65%}.line.l{width:90%}
+.tag{font-size:11px;color:var(--mute)}
+
+/* product image style */
+.prod-img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
+
+/* promo bar */
+.promo{background:var(--ink);color:var(--frame);text-align:center;padding:7px 12px;font-size:12px}
+
+/* header */
+.head{display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.logo-box{width:110px;height:30px;display:flex;align-items:center;justify-content:center;flex:none}
+.logo-img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.search{flex:1;height:38px;border:1px solid var(--line);border-radius:19px;display:flex;align-items:center;padding:0 14px;color:var(--mute);gap:8px;min-width:0}
+.icons{display:flex;gap:14px;flex-none}
+.ico.ico-img{border:0;border-radius:0}
+.ico.ico-img.noimg{border:1.5px solid var(--ink);border-radius:50%}
+.ico-img img{width:100%;height:100%;object-fit:contain;display:block}
+.search:focus-within{outline:2px solid var(--note);outline-offset:2px}
+.search .ico{flex:none}
+.search input{flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--ink);font:inherit;outline:none}
+.search input::placeholder{color:var(--mute)}
+.ico{width:26px;height:26px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-size:10px;position:relative}
+.ico b{position:absolute;top:-6px;right:-8px;background:var(--note);color:#fff;border-radius:9px;font-size:9px;padding:1px 5px}
+.burger{display:none;width:26px;height:20px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);position:relative;flex-none}
+.burger::after{content:"";position:absolute;left:0;right:0;top:7px;border-top:2px solid var(--ink)}
+
+/* tabs */
+.titlebar{padding:16px 20px;border-bottom:1px solid var(--line)}
+.shop-title{font-size:22px;font-weight:700;letter-spacing:.01em}
+
+/* hero slider */
+.hero{padding:20px}
+.hero-slider{
+  position:relative;
+  width:100%;
+  aspect-ratio:21 / 9;
+  max-height:420px;
+  min-height:200px;
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--block);
+  touch-action:pan-y;
+}
+.hero-track{
+  position:absolute;
+  inset:0;
+  display:flex;
+  transition:transform .4s cubic-bezier(0.25, 1, 0.5, 1);
+  user-select:none;
+}
+.hero-slide{
+  position:relative;
+  flex:0 0 100%;
+  min-width:100%;
+  overflow:hidden;
+}
+.hero-slide img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+}
+.dots{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--block);cursor:pointer;transition:background .2s, transform .2s}
+.dots i.active{background:var(--ink);transform:scale(1.2)}
+
+/* categories */
+.cats{display:flex;gap:18px;padding:6px 20px 18px;overflow-x:auto;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{flex:none;text-align:center;width:92px;padding:4px 2px 6px;border-radius:10px;color:var(--mute)}
+.cat .ph{width:64px;height:64px;border-radius:50%;margin:0 auto 8px}
+.cat .ph .tab-icon{width:100%;height:100%;object-fit:cover;display:block}
+.cat span{font-size:12px;display:block;line-height:1.25}
+.cat:hover{color:var(--ink)}
+.cat[aria-selected="true"]{color:var(--ink);font-weight:700}
+.cat[aria-selected="true"] .ph{box-shadow:0 0 0 3px var(--frame),0 0 0 5px var(--ink)}
+
+/* sections */
+.sec{padding:8px 20px 22px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.sec-head h3{font-size:17px}
+.sec-head a{font-size:13px;color:var(--mute);text-decoration:underline}
+.chips{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border:1px solid var(--line);border-radius:16px;font-size:12px;line-height:1.45}
+.chip.on{background:var(--ink);color:var(--frame);border-color:var(--ink)}
+.filter-wrap{position:relative}
+.caret{font-size:10px}
+.fmenu{position:absolute;top:calc(100% + 6px);left:0;z-index:20;min-width:190px;background:var(--frame);border:1px solid var(--line);border-radius:10px;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.fmenu button{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:7px;font-size:13px}
+.fmenu button:hover{background:var(--block2)}
+.fmenu button[aria-checked="true"]{font-weight:700}
+.fmenu button[aria-checked="true"]::after{content:"\2713";float:right;margin-left:12px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;position:relative}
+.card .img-box{width:100%;aspect-ratio:1/1;flex:none;background:var(--block);border-radius:6px;overflow:hidden;position:relative}
+.card .name{font-weight:600;font-size:13px}
+.price{font-weight:700}
+.old{color:var(--mute);text-decoration:line-through;font-size:12px;margin-left:6px}
+.badge{position:absolute;top:16px;left:16px;z-index:2;background:var(--ink);color:var(--frame);font-size:10px;padding:2px 8px;border-radius:10px}
+.cta{margin-top:auto;text-align:center;border:1.5px solid var(--ink);border-radius:8px;padding:6px;font-size:12px;font-weight:600}
+
+.promo-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 20px 22px}
+.promo-row .ph{aspect-ratio:16/6;display:grid;place-items:center}
+.promo-row .ph span{position:relative;z-index:1;background:var(--frame);padding:3px 10px;border-radius:5px;font-size:12px;border:1px solid var(--line)}
+
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--block2)}
+.trust div{display:flex;gap:10px;align-items:center}
+.trust .ph{width:34px;height:34px;border-radius:50%;flex:none}
+.trust strong{font-size:13px;display:block}
+
+.foot{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:20px;padding:28px 20px;background:color-mix(in srgb,var(--frame) 72%,black)}
+.foot h4{font-size:13px;margin-bottom:10px}
+.foot .line{margin-bottom:8px;background:color-mix(in srgb,var(--ink) 22%,transparent)}
+.foot-text{font-size:12px;color:var(--ink);line-height:1.5}
+.foot-link{display:block;width:fit-content;font-size:13px;color:var(--ink);text-decoration:none;margin-bottom:8px}
+.foot-link:hover{text-decoration:underline}
+.copy{border-top:1px solid var(--line);padding:12px 20px;text-align:center;color:var(--mute);font-size:12px}
+
+/* cart button */
+.cartbtn{display:flex;align-items:center;gap:8px;position:relative;padding:4px 8px 4px 6px;border-radius:8px}
+.cartbtn:hover{background:var(--block2)}
+.cartbtn .lbl{font-weight:600;font-size:13px}
+.ico b[hidden]{display:none}
+
+/* overlays */
+.overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.5);display:none;justify-content:center}
+.overlay.open{display:flex}
+.ov-in{position:relative;width:100%;max-width:1200px;display:flex}
+.stage[data-vp="mobile"] ~ .overlay .ov-in{max-width:390px}
+.modal{margin:auto;width:min(420px,calc(100% - 28px));background:var(--frame);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:14px}
+.modal h2{font-size:17px}
+.mini{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:8px}
+.mini .img-box{width:48px;height:48px;flex:none;background:var(--block);border-radius:6px;overflow:hidden}
+.field label{display:block;font-size:12px;font-weight:600;margin-bottom:6px}
+.inp{display:flex;align-items:center;border:1.5px solid var(--ink);border-radius:8px;padding:0 12px;height:42px;gap:4px}
+.inp.err{border-color:var(--note)}
+.inp span{color:var(--mute)}
+.inp input{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;outline:none;min-width:0;height:100%}
+.inp:focus-within{outline:2px solid var(--note);outline-offset:2px}
+.errmsg{color:var(--note);font-size:12px;min-height:16px;margin-top:6px}
+.row{display:flex;gap:10px;justify-content:flex-end}
+.row .btn{margin-top:0}
+.btn{background:none;color:var(--ink);padding:10px 20px;border-radius:10px;font-weight:600;line-height:1.2}
+.btn:not(.fill){border:1.5px solid var(--line)}
+.btn.fill{background:var(--ink);color:var(--frame)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+
+/* cart drawer */
+.drawer{margin-left:auto;width:min(400px,100%);height:100%;background:var(--frame);color:var(--ink);border-left:1px solid var(--line);display:flex;flex-direction:column}
+.dr-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}
+.dr-head h2{font-size:17px}
+.closebtn{width:30px;height:30px;border:1.5px solid var(--ink);border-radius:50%;font-weight:700;line-height:1}
+.dr-body{flex:1;overflow-y:auto;padding:14px 18px;display:grid;gap:12px;align-content:start}
+.empty{text-align:center;color:var(--mute);padding:40px 10px;border:1.5px dashed var(--line);border-radius:10px}
+.item{display:grid;grid-template-columns:64px 1fr;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.item .img-box{width:64px;height:64px;background:var(--block);border-radius:6px;overflow:hidden}
+.item .who{font-size:12px;color:var(--mute)}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:6px}
+.qty button{width:28px;height:26px}
+.qty span{min-width:26px;text-align:center;font-size:13px}
+.rm{font-size:12px;color:var(--mute);text-decoration:underline;margin-left:10px}
+.dr-foot{border-top:1px solid var(--line);padding:16px 18px;display:grid;gap:10px}
+.sum{display:flex;justify-content:space-between;font-weight:700}
+.dr-foot .btn{margin:0;text-align:center;width:100%;padding:13px 20px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--frame);padding:9px 16px;border-radius:20px;font-size:13px;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+
+.modal p{font-size:15px;line-height:1.6}
+.modal .lnk{word-break:break-all;color:var(--ink);text-decoration:underline;font-weight:600}
+
+/* mobile frame overrides */
+.stage[data-vp="mobile"] .head{padding:12px 14px;gap:10px}
+.stage[data-vp="mobile"] .burger{display:block}
+.stage[data-vp="mobile"] .logo-box{width:84px}
+.stage[data-vp="mobile"] .icons .hide-m{display:none}
+.stage[data-vp="mobile"] .titlebar,.stage[data-vp="mobile"] .cats,.stage[data-vp="mobile"] .sec,.stage[data-vp="mobile"] .hero,.stage[data-vp="mobile"] .promo-row,.stage[data-vp="mobile"] .foot,.stage[data-vp="mobile"] .trust{padding-left:14px;padding-right:14px}
+.stage[data-vp="mobile"] .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+.stage[data-vp="mobile"] .promo-row{grid-template-columns:1fr}
+.stage[data-vp="mobile"] .trust{grid-template-columns:1fr 1fr}
+.stage[data-vp="mobile"] .foot{grid-template-columns:1fr 1fr}
+.stage[data-vp="mobile"] .hero-slider{aspect-ratio:16 / 9;max-height:220px}
+@media (max-width:760px){
+  .stage:not([data-vp="mobile"]) .grid{grid-template-columns:repeat(2,1fr)}
+  .stage:not([data-vp="mobile"]) .promo-row{grid-template-columns:1fr}
+  .stage:not([data-vp="mobile"]) .trust,.stage:not([data-vp="mobile"]) .foot{grid-template-columns:1fr 1fr}
+  .stage:not([data-vp="mobile"]) .burger{display:block}
+  .stage:not([data-vp="mobile"]) .icons .hide-m{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="ctrls">
+    <div class="seg" role="group" aria-label="Viewport">
+      <button id="vpD" aria-pressed="true">Desktop</button>
+      <button id="vpM" aria-pressed="false">Mobile</button>
+    </div>
+  </div>
+</div>
+
+<div class="stage" id="stage" data-vp="desktop">
+  <div class="frame" id="frame">
+
+    <div class="promo rel" style="font-size: 8pt;">For Roleplaying Purposes Only. No real transactions happen.</div>
+
+    <header class="head rel">
+      <span class="burger" aria-hidden="true"></span>
+      <div class="logo-box">
+        <img src="MASTERJAMLOGO.png" alt="MASTERJAM Logo" class="logo-img">
+      </div>
+      <div class="search">
+        <span class="ico ico-img" style="width:18px;height:18px"><img src="search.png" alt="" onerror="this.style.display='none';this.parentNode.classList.add('noimg')"></span>
+        <input id="searchInput" type="search" placeholder="Search" aria-label="Search products" autocomplete="off" spellcheck="false" enterkeyhint="search">
+      </div>
+      <div class="icons">
+        <span class="ico hide-m" title="Account"></span>
+        <span class="ico hide-m" title="Wishlist"></span>
+        <button class="cartbtn" id="cartBtn" aria-label="Open cart and checkout">
+          <span class="ico ico-img"><img src="keranjang.png" alt="" onerror="this.style.display='none';this.parentNode.classList.add('noimg')"><b id="cartCount" hidden>0</b></span>
+          <span class="lbl hide-m">Checkout</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="titlebar rel">
+      <h2 class="shop-title">MASTERJAM Shop</h2>
+    </div>
+
+    <!-- Hero Banner Slider -->
+    <section class="hero rel">
+      <div class="hero-slider" id="heroSlider">
+        <div class="hero-track" id="heroTrack">
+          <div class="hero-slide"><img src="MASTERJAMHERO.jpeg" alt="MASTERJAMHERO"></div>
+          <div class="hero-slide"><img src="MONARCHHERO.jpeg" alt="MONARCHHERO"></div>
+          <div class="hero-slide"><img src="MJHERO.jpeg" alt="MJHERO"></div>
+          <div class="hero-slide"><img src="CHANDRAHERO.jpeg" alt="CHANDRAHERO"></div>
+          <div class="hero-slide"><img src="AKSAHERO.jpeg" alt="AKSAHERO"></div>
+          <div class="hero-slide"><img src="OETHHERO.jpeg" alt="OETHHERO"></div>
+        </div>
+      </div>
+      <div class="dots" id="heroDots"></div>
+    </section>
+
+    <div class="cats rel" role="tablist" aria-label="Collections" id="cats"></div>
+
+    <section class="sec rel">
+      <div class="sec-head"><h3 id="secA">New arrivals</h3><a>See all</a></div>
+      <div class="chips">
+        <button class="chip on" id="chipAll" type="button">All</button>
+        <div class="filter-wrap">
+          <button class="chip" id="chipFilter" type="button" aria-haspopup="menu" aria-expanded="false">Filter <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="fmenu" id="fMenu" role="menu" hidden>
+            <button type="button" role="menuitemradio" aria-checked="false" data-sort="asc">Price: Low to high</button>
+            <button type="button" role="menuitemradio" aria-checked="false" data-sort="desc">Price: High to low</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid" id="gridA"></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><h3 id="secB">Best sellers</h3><a>See all</a></div>
+      <div class="grid" id="gridB"></div>
+    </section>
+
+    <footer>
+      <div class="foot">
+        <div>
+          <h4>MASTERJAM Shop</h4>
+          <p class="foot-text">For Roleplay Purposes Only. No real transactions happen.</p>
+        </div>
+        <div>
+          <h4>Info</h4>
+          <a class="foot-link" href="https://x.com/mnjnnt/status/2101184266009010400" target="_blank" rel="noopener noreferrer">Click here</a>
+        </div>
+        <div>
+          <h4>Our Page</h4>
+          <a class="foot-link" href="https://x.com/MASTERJAM" target="_blank" rel="noopener noreferrer">MASTERJAM</a>
+          <a class="foot-link" href="https://x.com/mnjnnt" target="_blank" rel="noopener noreferrer">MJ</a>
+          <a class="foot-link" href="https://x.com/KH901002" target="_blank" rel="noopener noreferrer">CHANDRA</a>
+          <a class="foot-link" href="https://x.com/overaxon" target="_blank" rel="noopener noreferrer">AKSA</a>
+          <a class="foot-link" href="https://x.com/heningnyariuh" target="_blank" rel="noopener noreferrer">OETH</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div class="overlay" id="userOv" aria-hidden="true">
+  <div class="ov-in">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="uTitle">
+      <h2 id="uTitle">Enter your X username</h2>
+      <div class="mini">
+        <div class="img-box"><img id="uImg" src="" alt="" class="prod-img"></div>
+        <div><div class="name" id="uName" style="font-weight:600">Product name</div><div class="tag" id="uColl"></div></div>
+      </div>
+      <div class="field">
+        <label for="uInput">X username</label>
+        <div class="inp" id="uBox"><span>@</span><input id="uInput" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="16" placeholder="username"></div>
+        <div class="errmsg" id="uErr" role="alert"></div>
+      </div>
+      <div class="row">
+        <button class="btn" id="uCancel">Cancel</button>
+        <button class="btn fill" id="uOk">Add to cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="cartOv" aria-hidden="true">
+  <div class="ov-in">
+    <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="cTitle">
+      <div class="dr-head"><h2 id="cTitle">Your cart</h2><button class="closebtn" id="cClose" aria-label="Close cart">&times;</button></div>
+      <div class="dr-body" id="cBody"></div>
+      <div class="dr-foot">
+        <div class="sum"><span id="cSumLbl">Subtotal</span><span id="cSum">Rp 0</span></div>
+        <button class="btn fill" id="cCheckout">Checkout</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="overlay" id="coOv" aria-hidden="true">
+  <div class="ov-in">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="coText">
+      <p id="coText">Screenshoot your cart and confirm here:<br>
+        <a class="lnk" id="coLink" href="https://x.com/mnjnnt/status/2101184266009010400?s=46" target="_blank" rel="noopener noreferrer">https://x.com/mnjnnt/status/2101184266009010400</a>
+      </p>
+      <div class="row"><button class="btn fill" id="coClose">Close</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* =====================================================================
+   DATA PRODUK  ->  EDIT DI SINI
+   ---------------------------------------------------------------------
+   Setiap tab punya daftar produknya sendiri. Tiap produk punya:
+     name     : nama produk (teks)
+     subtitle : teks kecil di bawah nama (teks)
+     price    : harga dalam angka TANPA titik/koma, contoh 150000
+                (otomatis tampil "Rp 150.000")
+     best     : true  -> ikut tampil di section "Best sellers"
+                (opsional, hapus / false kalau bukan best seller)
+     img      : (opsional) nama file foto. Kalau dikosongkan otomatis
+                memakai pola PREFIX + nomor + ".jpeg", mis. MASTERJAM1.jpeg
+
+   Mau tambah produk? Tambah satu baris { ... } di dalam array.
+   Mau kurangi? Hapus barisnya. Jumlah kartu mengikuti isi array.
+   ===================================================================== */
+const PRODUCTS = {
+
+  /* ---------- TAB 1: MASTERJAM Merch ---------- */
+  MASTERJAM: [
+    { name: "MASTERJAM 1", subtitle: "MASTERJAM Merch", price: 100000 },
+    { name: "MASTERJAM 2", subtitle: "MASTERJAM Merch", price: 100000 },
+    { name: "MASTERJAM 3", subtitle: "MASTERJAM Merch", price: 100000, best: true },
+    { name: "MASTERJAM 4", subtitle: "MASTERJAM Merch", price: 100000 },
+    { name: "MASTERJAM 5", subtitle: "MASTERJAM Merch", price: 100000 },
+    { name: "MASTERJAM 6", subtitle: "MASTERJAM Merch", price: 100000, best: true }
+  ],
+
+  /* ---------- TAB 2: MONARCH Merch ---------- */
+  MONARCH: [
+    { name: "MONARCH 1", subtitle: "MONARCH Merch", price: 100000 },
+    { name: "MONARCH 2", subtitle: "MONARCH Merch", price: 100000 },
+    { name: "MONARCH 3", subtitle: "MONARCH Merch", price: 100000, best: true },
+    { name: "MONARCH 4", subtitle: "MONARCH Merch", price: 100000 },
+    { name: "MONARCH 5", subtitle: "MONARCH Merch", price: 100000 },
+    { name: "MONARCH 6", subtitle: "MONARCH Merch", price: 100000, best: true }
+  ],
+
+  /* ---------- TAB 3: MJ Collection ---------- */
+  MJ: [
+    { name: "MJ 1", subtitle: "MJ Collection", price: 100000 },
+    { name: "MJ 2", subtitle: "MJ Collection", price: 100000 },
+    { name: "MJ 3", subtitle: "MJ Collection", price: 100000, best: true },
+    { name: "MJ 4", subtitle: "MJ Collection", price: 100000 },
+    { name: "MJ 5", subtitle: "MJ Collection", price: 100000 },
+    { name: "MJ 6", subtitle: "MJ Collection", price: 100000, best: true }
+  ],
+
+  /* ---------- TAB 4: CHANDRA Collection ---------- */
+  CHANDRA: [
+    { name: "CHANDRA 1", subtitle: "CHANDRA Collection", price: 100000 },
+    { name: "CHANDRA 2", subtitle: "CHANDRA Collection", price: 100000 },
+    { name: "CHANDRA 3", subtitle: "CHANDRA Collection", price: 100000, best: true },
+    { name: "CHANDRA 4", subtitle: "CHANDRA Collection", price: 100000 },
+    { name: "CHANDRA 5", subtitle: "CHANDRA Collection", price: 100000 },
+    { name: "CHANDRA 6", subtitle: "CHANDRA Collection", price: 100000, best: true }
+  ],
+
+  /* ---------- TAB 5: AKSA Collection ---------- */
+  AKSA: [
+    { name: "AKSA 1", subtitle: "AKSA Collection", price: 100000 },
+    { name: "AKSA 2", subtitle: "AKSA Collection", price: 100000 },
+    { name: "AKSA 3", subtitle: "AKSA Collection", price: 100000, best: true },
+    { name: "AKSA 4", subtitle: "AKSA Collection", price: 100000 },
+    { name: "AKSA 5", subtitle: "AKSA Collection", price: 100000 },
+    { name: "AKSA 6", subtitle: "AKSA Collection", price: 100000, best: true }
+  ],
+
+  /* ---------- TAB 6: OETH Collection ---------- */
+  OETH: [
+    { name: "OETH 1", subtitle: "OETH Collection", price: 100000 },
+    { name: "OETH 2", subtitle: "OETH Collection", price: 100000 },
+    { name: "OETH 3", subtitle: "OETH Collection", price: 100000, best: true },
+    { name: "OETH 4", subtitle: "OETH Collection", price: 100000 },
+    { name: "OETH 5", subtitle: "OETH Collection", price: 100000 },
+    { name: "OETH 6", subtitle: "OETH Collection", price: 100000, best: true }
+  ]
+};
+/* ===================== AKHIR DATA PRODUK ===================== */
+
+/* =====================================================================
+   ICON TAB  ->  EDIT DI SINI
+   ---------------------------------------------------------------------
+   Isi nama file .jpeg untuk icon bulat di setiap tab.
+   File diletakkan satu folder dengan file HTML ini.
+   Kalau file belum ada / dikosongkan (""), otomatis tampil lingkaran abu-abu.
+   ===================================================================== */
+const TAB_ICONS = {
+  MASTERJAM: "MASTERJAMICON.jpeg",   // tab: MASTERJAM Merch
+  MONARCH:   "MONARCHICON.jpeg",     // tab: MONARCH Merch
+  MJ:        "MJICON.jpeg",          // tab: MJ Collection
+  CHANDRA:   "CHANDRAICON.jpeg",     // tab: CHANDRA Collection
+  AKSA:      "AKSAICON.jpeg",        // tab: AKSA Collection
+  OETH:      "OETHICON.jpeg"         // tab: OETH Collection
+};
+/* ===================== AKHIR ICON TAB ===================== */
+
+/* helper: format harga & escape teks (supaya tanda kutip / < > di nama aman) */
+const rupiah = n => "Rp " + (Number(n) || 0).toLocaleString("id-ID");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---- HERO BANNER SLIDER LOGIC ---- */
+(function setupHeroSlider() {
+  const track = document.getElementById('heroTrack');
+  const slider = document.getElementById('heroSlider');
+  const dotsContainer = document.getElementById('heroDots');
+  const slides = track.querySelectorAll('.hero-slide');
+  const totalSlides = slides.length;
+  let currentIndex = 0;
+  let autoSlideTimer = null;
+
+  dotsContainer.innerHTML = '';
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('i');
+    if (i === 0) dot.classList.add('active');
+    dot.addEventListener('click', () => {
+      goToSlide(i);
+      resetAutoSlide();
+    });
+    dotsContainer.appendChild(dot);
+  }
+  const dots = dotsContainer.querySelectorAll('i');
+
+  function goToSlide(index) {
+    currentIndex = (index + totalSlides) % totalSlides;
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle('active', idx === currentIndex);
+    });
+  }
+
+  function startAutoSlide() {
+    stopAutoSlide();
+    autoSlideTimer = setInterval(() => {
+      goToSlide(currentIndex + 1);
+    }, 2000);
+  }
+
+  function stopAutoSlide() {
+    if (autoSlideTimer) clearInterval(autoSlideTimer);
+  }
+
+  function resetAutoSlide() {
+    stopAutoSlide();
+    startAutoSlide();
+  }
+
+  let startX = 0;
+  let isDragging = false;
+
+  function getPositionX(e) {
+    return e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+  }
+
+  function touchStart(e) {
+    isDragging = true;
+    startX = getPositionX(e);
+    stopAutoSlide();
+  }
+
+  function touchEnd(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    const endX = e.type.includes('touch') ? e.changedTouches[0].clientX : e.clientX;
+    const diffX = endX - startX;
+
+    if (Math.abs(diffX) > 30) {
+      if (diffX < 0) goToSlide(currentIndex + 1);
+      else goToSlide(currentIndex - 1);
+    }
+    resetAutoSlide();
+  }
+
+  slider.addEventListener('touchstart', touchStart, { passive: true });
+  slider.addEventListener('touchend', touchEnd);
+
+  slider.addEventListener('mousedown', touchStart);
+  slider.addEventListener('mouseup', touchEnd);
+  slider.addEventListener('mouseleave', () => {
+    if (isDragging) touchEnd({ clientX: startX, type: 'mouseup' });
+  });
+
+  startAutoSlide();
+})();
+
+/* ---- TABS & PRODUCT LOGIC ---- */
+const TABS = [
+  {name:"MASTERJAM Merch", prefix:"MASTERJAM", kind:"Merch", cats:["Tees","Hoodies","Caps","Bags","Accessories","Sale"]},
+  {name:"MONARCH Merch",   prefix:"MONARCH",   kind:"Merch", cats:["Tees","Jackets","Caps","Totes","Stickers","Sale"]},
+  {name:"MJ Collection",   prefix:"MJ",        kind:"Collection", cats:["Albums","Photo sets","Posters","Limited","Bundles","Sale"]},
+  {name:"CHANDRA Collection", prefix:"CHANDRA", kind:"Collection", cats:["Albums","Photo sets","Posters","Limited","Bundles","Sale"]},
+  {name:"AKSA Collection", prefix:"AKSA",      kind:"Collection", cats:["Albums","Photo sets","Posters","Limited","Bundles","Sale"]},
+  {name:"OETH Collection", prefix:"OETH",      kind:"Collection", cats:["Albums","Photo sets","Posters","Limited","Bundles","Sale"]}
+];
+let current = 0;
+
+/* urutan harga: null = urutan asli (All), "asc" = termurah dulu, "desc" = termahal dulu */
+let sortMode = null;
+
+/* pencarian: true = cari di semua tab, false = hanya di tab yang sedang aktif */
+const SEARCH_ALL_TABS = true;
+let searchQuery = "";
+function sortIdx(idxs, items){
+  if(!sortMode) return idxs;
+  return [...idxs].sort((a,b)=> sortMode==="asc"
+    ? (Number(items[a].price)||0) - (Number(items[b].price)||0)
+    : (Number(items[b].price)||0) - (Number(items[a].price)||0));
+}
+const tabsEl = document.getElementById("cats");
+TABS.forEach((t,i)=>{
+  const b = document.createElement("button");
+  b.className = "cat"; b.setAttribute("role","tab");
+  const icon = TAB_ICONS[t.prefix];
+  b.innerHTML = `<div class="ph">${icon ? `<img src="${esc(icon)}" alt="" class="tab-icon" onerror="this.style.display='none'">` : ""}</div><span>${t.name}</span>`;
+  b.setAttribute("aria-selected", i===0);
+  b.addEventListener("click",()=>select(i,false,true));
+  b.addEventListener("keydown",e=>{
+    if(e.key==="ArrowRight") select((current+1)%TABS.length,true,true);
+    if(e.key==="ArrowLeft") select((current-1+TABS.length)%TABS.length,true,true);
+  });
+  tabsEl.appendChild(b);
+});
+
+/* list = daftar index produk yang mau ditampilkan; data diambil dari PRODUCTS */
+function cards(list, tabIdx){
+  const t = TABS[tabIdx];
+  const items = PRODUCTS[t.prefix] || [];
+  return list.filter(k => items[k]).map(k=>{
+    const p = items[k];
+    const img = p.img || (t.prefix + (k+1) + ".jpeg");
+    const sub = (p.subtitle !== undefined && p.subtitle !== null) ? p.subtitle : t.name;
+    return `<div class="card" data-id="${tabIdx}-${k}" data-name="${esc(p.name)}" data-img="${esc(img)}" data-sub="${esc(sub)}" data-price="${Number(p.price) || 0}">
+      <div class="img-box">
+        <img src="${esc(img)}" alt="${esc(p.name)}" class="prod-img" onerror="this.style.display='none'">
+      </div>
+      <div><div class="name">${esc(p.name)}</div><div class="tag">${esc(sub)}</div></div>
+      <div><span class="price">${rupiah(p.price)}</span></div>
+      <button class="cta" data-add>Add to cart</button></div>`;
+  }).join("");
+}
+
+function select(i, focus, scroll){
+  current = i; const t = TABS[i];
+  [...tabsEl.querySelectorAll(".cat")].forEach((b,j)=>{
+    b.setAttribute("aria-selected", j===i);
+    b.tabIndex = j===i ? 0 : -1;
+    if(j===i && focus) b.focus({preventScroll:true});
+    if(j===i && scroll) tabsEl.scrollTo({left: b.offsetLeft - (tabsEl.clientWidth - b.offsetWidth)/2, behavior:"smooth"});
+  });
+  renderProducts();
+}
+
+/* render grid produk: mode normal (per tab) atau mode hasil pencarian */
+function renderProducts(){
+  const secA = document.getElementById("secA"), secB = document.getElementById("secB");
+  const gridA = document.getElementById("gridA"), gridB = document.getElementById("gridB");
+  const secBWrap = secB.closest(".sec");
+
+  if(searchQuery){
+    const q = searchQuery.toLowerCase();
+    const tabIdxs = SEARCH_ALL_TABS ? TABS.map((_,ti)=>ti) : [current];
+    const hits = [];
+    tabIdxs.forEach(ti=>{
+      (PRODUCTS[TABS[ti].prefix] || []).forEach((p,k)=>{
+        const hay = (p.name + " " + (p.subtitle || "") + " " + TABS[ti].name).toLowerCase();
+        if(hay.includes(q)) hits.push({ti, k, price:Number(p.price)||0});
+      });
+    });
+    if(sortMode) hits.sort((a,b)=> sortMode==="asc" ? a.price-b.price : b.price-a.price);
+    secA.textContent = `Search results for "${searchQuery}" (${hits.length})`;
+    gridA.innerHTML = hits.length
+      ? hits.map(h=>cards([h.k], h.ti)).join("")
+      : '<div class="empty" style="grid-column:1/-1">No products found.</div>';
+    secBWrap.hidden = true;
+    return;
+  }
+
+  const t = TABS[current];
+  const items = PRODUCTS[t.prefix] || [];
+  const all = items.map((_,k)=>k);
+  const best = all.filter(k => items[k].best);
+  secBWrap.hidden = false;
+  secA.textContent = t.name + ": new arrivals";
+  secB.textContent = t.name + ": best sellers";
+  gridA.innerHTML = cards(sortIdx(all, items), current);
+  gridB.innerHTML = cards(sortIdx(best, items), current);
+}
+
+/* ---- SEARCH ---- */
+const searchInput = document.getElementById("searchInput");
+searchInput.addEventListener("input", ()=>{
+  searchQuery = searchInput.value.trim();
+  renderProducts();
+});
+searchInput.addEventListener("keydown", e=>{
+  if(e.key==="Enter"){
+    e.preventDefault();
+    searchInput.blur();
+    document.getElementById("secA").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  if(e.key==="Escape" && searchInput.value){
+    searchInput.value = ""; searchQuery = "";
+    renderProducts();
+  }
+});
+select(0);
+
+/* ---- FILTER (urutkan harga) ---- */
+const chipAll = document.getElementById("chipAll");
+const chipFilter = document.getElementById("chipFilter");
+const fMenu = document.getElementById("fMenu");
+
+function setMenu(open){
+  fMenu.hidden = !open;
+  chipFilter.setAttribute("aria-expanded", open);
+}
+function setSort(mode){
+  sortMode = mode;
+  chipAll.classList.toggle("on", !mode);
+  chipFilter.classList.toggle("on", !!mode);
+  fMenu.querySelectorAll("button").forEach(b=>b.setAttribute("aria-checked", b.dataset.sort === mode));
+  select(current);
+}
+chipAll.addEventListener("click", ()=>{ setMenu(false); setSort(null); });
+chipFilter.addEventListener("click", ()=>setMenu(fMenu.hidden));
+fMenu.addEventListener("click", e=>{
+  const b = e.target.closest("[data-sort]");
+  if(!b) return;
+  setMenu(false);
+  setSort(b.dataset.sort);
+});
+document.addEventListener("click", e=>{
+  if(!fMenu.hidden && !e.target.closest(".filter-wrap")) setMenu(false);
+});
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape" && !fMenu.hidden){ setMenu(false); chipFilter.focus(); }
+});
+
+const stage = document.getElementById("stage");
+const vpD = document.getElementById("vpD"), vpM = document.getElementById("vpM");
+function vp(mode){
+  stage.dataset.vp = mode;
+  vpD.setAttribute("aria-pressed", mode==="desktop");
+  vpM.setAttribute("aria-pressed", mode==="mobile");
+}
+vpD.onclick=()=>vp("desktop"); vpM.onclick=()=>vp("mobile");
+
+/* ---- CART + USERNAME POPUP ---- */
+const $ = id => document.getElementById(id);
+const cart = [];
+let lastUser = "", pending = null, lastFocus = null, toastT;
+
+function toast(msg){
+  const t = $("toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("on"), 2400);
+}
+function openOv(id, focusEl){
+  const ov = $(id); ov.classList.add("open"); ov.setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden";
+  if(focusEl) setTimeout(()=>focusEl.focus(), 0);
+}
+let coPrev = null;
+function closeOv(id){
+  const ov = $(id); ov.classList.remove("open"); ov.setAttribute("aria-hidden","true");
+  if(!document.querySelector(".overlay.open")) document.body.style.overflow = "";
+  if(lastFocus && document.contains(lastFocus)) lastFocus.focus();
+  if(id==="coOv") lastFocus = coPrev;
+}
+function totalQty(){ return cart.reduce((s,it)=>s+it.qty,0); }
+function totalPrice(){ return cart.reduce((s,it)=>s+it.price*it.qty,0); }
+function updateBadge(){
+  const n = totalQty(), b = $("cartCount");
+  b.textContent = n; b.hidden = n===0;
+}
+function renderCart(){
+  const body = $("cBody"), n = totalQty();
+  if(!cart.length){
+    body.innerHTML = '<div class="empty">Your cart is empty.<br>Add an item from any collection.</div>';
+  } else {
+    body.innerHTML = cart.map((it,i)=>`
+      <div class="item">
+        <div class="img-box">
+          <img src="${esc(it.img)}" alt="${esc(it.name)}" class="prod-img" onerror="this.style.display='none'">
+        </div>
+        <div>
+          <div class="name" style="font-weight:600">${esc(it.name)}</div>
+          <div class="tag">${esc(it.sub)}</div>
+          <div class="who">X: @${esc(it.user)}</div>
+          <div class="price">${rupiah(it.price)}</div>
+          <div><span class="qty"><button aria-label="Decrease quantity" data-q="-1" data-i="${i}">&minus;</button><span>${it.qty}</span><button aria-label="Increase quantity" data-q="1" data-i="${i}">+</button></span><button class="rm" data-rm="${i}">Remove</button></div>
+        </div>
+      </div>`).join("");
+  }
+  $("cSumLbl").textContent = `Subtotal (${n} item${n===1?"":"s"})`;
+  $("cSum").textContent = rupiah(totalPrice());
+  $("cCheckout").disabled = !cart.length;
+  updateBadge();
+}
+
+function addItem(item, user){
+  const ex = cart.find(it=>it.id===item.id && it.user.toLowerCase()===user.toLowerCase());
+  if(ex) ex.qty++; else cart.push({...item, user, qty:1});
+  renderCart();
+  toast(`Added to cart for @${user}`);
+}
+function itemFromCard(card){
+  return {id:card.dataset.id, name:card.dataset.name, img:card.dataset.img, sub:card.dataset.sub, price:Number(card.dataset.price)||0};
+}
+function openUser(card, btn){
+  pending = itemFromCard(card);
+  lastFocus = btn;
+  $("uName").textContent = pending.name;
+  $("uImg").src = pending.img;
+  $("uImg").alt = pending.name;
+  $("uColl").textContent = pending.sub;
+  $("uInput").value = lastUser;
+  $("uErr").textContent = ""; $("uBox").classList.remove("err");
+  openOv("userOv", $("uInput"));
+}
+function confirmUser(){
+  const v = $("uInput").value.trim().replace(/^@+/,"");
+  if(!/^[A-Za-z0-9_]{1,15}$/.test(v)){$("uErr").textContent = "Enter 1 to 15 letters, numbers or underscores.";
+    $("uBox").classList.add("err"); $("uInput").focus(); return;
+  }
+  lastUser = v;
+  closeOv("userOv");
+  addItem(pending, v);
+}
+
+document.addEventListener("click", e=>{
+  const add = e.target.closest("[data-add]");
+  if(add){
+    const card = add.closest(".card");
+    if(lastUser) addItem(itemFromCard(card), lastUser);
+    else openUser(card, add);
+    return;
+  }
+  const q = e.target.closest("[data-q]");
+  if(q){
+    const it = cart[+q.dataset.i]; it.qty += +q.dataset.q;
+    if(it.qty<1) cart.splice(+q.dataset.i,1);
+    renderCart(); return;
+  }
+  const rm = e.target.closest("[data-rm]");
+  if(rm){ cart.splice(+rm.dataset.rm,1); renderCart(); return; }
+  if(e.target.classList.contains("overlay") || e.target.classList.contains("ov-in")){
+    closeOv(e.target.closest(".overlay").id);
+  }
+});
+$("cartBtn").onclick = e=>{ lastFocus = e.currentTarget; renderCart(); openOv("cartOv", $("cClose")); };
+$("cClose").onclick = ()=>closeOv("cartOv");
+$("uCancel").onclick = ()=>closeOv("userOv");
+$("uOk").onclick = confirmUser;
+$("uInput").addEventListener("keydown", e=>{ if(e.key==="Enter") confirmUser(); });
+$("uInput").addEventListener("input", ()=>{ $("uErr").textContent=""; $("uBox").classList.remove("err"); });
+$("cCheckout").onclick = ()=>{ coPrev = lastFocus; lastFocus = $("cCheckout"); openOv("coOv", $("coLink")); };
+$("coClose").onclick = ()=>closeOv("coOv");
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape"){
+    if($("coOv").classList.contains("open")) closeOv("coOv");
+    else if($("userOv").classList.contains("open")) closeOv("userOv");
+    else if($("cartOv").classList.contains("open")) closeOv("cartOv");
+  }
+});
+renderCart();
+</script>
+</body>
+</html>
