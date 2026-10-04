@@ -130,12 +130,38 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
 .fmenu button[aria-checked="true"]::after{content:"\2713";float:right;margin-left:12px}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .card{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;position:relative}
-.card .img-box{width:100%;aspect-ratio:1/1;flex:none;background:var(--block);border-radius:6px;overflow:hidden;position:relative}
+.card .img-box{width:100%;aspect-ratio:1/1;flex:none;background:var(--block);border-radius:6px;overflow:hidden;position:relative;cursor:zoom-in}
 .card .name{font-weight:600;font-size:13px}
 .price{font-weight:700}
 .old{color:var(--mute);text-decoration:line-through;font-size:12px;margin-left:6px}
 .badge{position:absolute;top:16px;left:16px;z-index:2;background:var(--ink);color:var(--frame);font-size:10px;padding:2px 8px;border-radius:10px}
 .cta{margin-top:auto;text-align:center;border:1.5px solid var(--ink);border-radius:8px;padding:6px;font-size:12px;font-weight:600}
+
+/* slider foto di kartu produk & popup */
+.slider{position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.slider::-webkit-scrollbar{display:none}
+.slider .slide{flex:0 0 100%;height:100%;scroll-snap-align:center;scroll-snap-stop:always}
+.slider .slide img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none;user-select:none}
+.nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.92);border:1px solid var(--line);font-size:17px;line-height:1;display:none}
+.nav.prev{left:6px}.nav.next{right:6px}
+.img-box.multi:hover .nav{display:block}
+@media (hover:none){.img-box.multi:hover .nav{display:none}}
+.mdots{position:absolute;bottom:6px;left:0;right:0;display:flex;gap:5px;justify-content:center;z-index:3;pointer-events:none}
+.mdots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.75);box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.mdots i.active{background:var(--ink)}
+
+/* popup foto */
+.lb{margin:auto;position:relative;width:min(720px,calc(100% - 28px));background:var(--frame);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:10px}
+.lb-view{position:relative;aspect-ratio:1/1;margin:0 auto;width:min(100%,58vh);background:var(--block);border-radius:8px;overflow:hidden}
+.lb-view .slide img{object-fit:contain}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.95);color:var(--ink);border:1.5px solid var(--ink);font-size:22px;font-weight:700;line-height:1;display:grid;place-items:center;padding:0 0 3px}
+.lb-nav.prev{left:8px}.lb-nav.next{right:8px}
+.lb-close{position:absolute;top:-12px;right:-12px;z-index:5;background:var(--frame)}
+.lb-cap{display:flex;justify-content:space-between;font-size:13px}
+.lb-cap #lbName{font-weight:600}
+.lb-info{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.lb-price{font-size:18px;font-weight:700}
+.lb-info .btn{padding:10px 22px}
 
 .promo-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 20px 22px}
 .promo-row .ph{aspect-ratio:16/6;display:grid;place-items:center}
@@ -326,6 +352,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
   </div>
 </div>
 
+<!-- Modal Input Username X -->
 <div class="overlay" id="userOv" aria-hidden="true">
   <div class="ov-in">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="uTitle">
@@ -347,6 +374,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
   </div>
 </div>
 
+<!-- Cart Drawer -->
 <div class="overlay" id="cartOv" aria-hidden="true">
   <div class="ov-in">
     <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="cTitle">
@@ -360,6 +388,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
   </div>
 </div>
 
+<!-- Modal Checkout Confirmation -->
 <div class="overlay" id="coOv" aria-hidden="true">
   <div class="ov-in">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="coText">
@@ -371,28 +400,36 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
   </div>
 </div>
 
+<!-- Popup/Lightbox Foto Produk -->
+<div class="overlay" id="lbOv" aria-hidden="true">
+  <div class="ov-in">
+    <div class="lb" role="dialog" aria-modal="true" aria-label="Product photos">
+      <button class="closebtn lb-close" id="lbClose" aria-label="Close">&times;</button>
+      <div class="lb-view">
+        <div class="slider" id="lbSlider"></div>
+        <button class="lb-nav prev" data-nav="-1" aria-label="Previous photo">&#8249;</button>
+        <button class="lb-nav next" data-nav="1" aria-label="Next photo">&#8250;</button>
+      </div>
+      <div class="lb-cap">
+        <span id="lbName"></span>
+        <span id="lbCount"></span>
+      </div>
+      <!-- Tampilan Harga & Tombol Add to Cart -->
+      <div class="lb-info">
+        <span class="lb-price" id="lbPrice"></span>
+        <button class="btn fill" id="lbAddToCart">Add to cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status"></div>
 
 <script>
 /* =====================================================================
-   DATA PRODUK  ->  EDIT DI SINI
-   ---------------------------------------------------------------------
-   Setiap tab punya daftar produknya sendiri. Tiap produk punya:
-     name     : nama produk (teks)
-     subtitle : teks kecil di bawah nama (teks)
-     price    : harga dalam angka TANPA titik/koma, contoh 150000
-                (otomatis tampil "Rp 150.000")
-     best     : true  -> ikut tampil di section "Best sellers"
-                (opsional, hapus / false kalau bukan best seller)
-     img      : (opsional) nama file foto. Kalau dikosongkan otomatis
-                memakai pola PREFIX + nomor + ".jpeg", mis. MASTERJAM1.jpeg
-
-   Mau tambah produk? Tambah satu baris { ... } di dalam array.
-   Mau kurangi? Hapus barisnya. Jumlah kartu mengikuti isi array.
+   DATA PRODUK
    ===================================================================== */
 const PRODUCTS = {
-
-  /* ---------- TAB 1: MASTERJAM Merch ---------- */
   MASTERJAM: [
     { name: "MASTERJAM 1", subtitle: "MASTERJAM Merch", price: 100000 },
     { name: "MASTERJAM 2", subtitle: "MASTERJAM Merch", price: 100000 },
@@ -401,8 +438,6 @@ const PRODUCTS = {
     { name: "MASTERJAM 5", subtitle: "MASTERJAM Merch", price: 100000 },
     { name: "MASTERJAM 6", subtitle: "MASTERJAM Merch", price: 100000, best: true }
   ],
-
-  /* ---------- TAB 2: MONARCH Merch ---------- */
   MONARCH: [
     { name: "MONARCH 1", subtitle: "MONARCH Merch", price: 100000 },
     { name: "MONARCH 2", subtitle: "MONARCH Merch", price: 100000 },
@@ -411,8 +446,6 @@ const PRODUCTS = {
     { name: "MONARCH 5", subtitle: "MONARCH Merch", price: 100000 },
     { name: "MONARCH 6", subtitle: "MONARCH Merch", price: 100000, best: true }
   ],
-
-  /* ---------- TAB 3: MJ Collection ---------- */
   MJ: [
     { name: "MJ 1", subtitle: "MJ Collection", price: 100000 },
     { name: "MJ 2", subtitle: "MJ Collection", price: 100000 },
@@ -421,8 +454,6 @@ const PRODUCTS = {
     { name: "MJ 5", subtitle: "MJ Collection", price: 100000 },
     { name: "MJ 6", subtitle: "MJ Collection", price: 100000, best: true }
   ],
-
-  /* ---------- TAB 4: CHANDRA Collection ---------- */
   CHANDRA: [
     { name: "CHANDRA 1", subtitle: "CHANDRA Collection", price: 100000 },
     { name: "CHANDRA 2", subtitle: "CHANDRA Collection", price: 100000 },
@@ -431,8 +462,6 @@ const PRODUCTS = {
     { name: "CHANDRA 5", subtitle: "CHANDRA Collection", price: 100000 },
     { name: "CHANDRA 6", subtitle: "CHANDRA Collection", price: 100000, best: true }
   ],
-
-  /* ---------- TAB 5: AKSA Collection ---------- */
   AKSA: [
     { name: "AKSA 1", subtitle: "AKSA Collection", price: 100000 },
     { name: "AKSA 2", subtitle: "AKSA Collection", price: 100000 },
@@ -441,8 +470,6 @@ const PRODUCTS = {
     { name: "AKSA 5", subtitle: "AKSA Collection", price: 100000 },
     { name: "AKSA 6", subtitle: "AKSA Collection", price: 100000, best: true }
   ],
-
-  /* ---------- TAB 6: OETH Collection ---------- */
   OETH: [
     { name: "OETH 1", subtitle: "OETH Collection", price: 100000 },
     { name: "OETH 2", subtitle: "OETH Collection", price: 100000 },
@@ -452,26 +479,16 @@ const PRODUCTS = {
     { name: "OETH 6", subtitle: "OETH Collection", price: 100000, best: true }
   ]
 };
-/* ===================== AKHIR DATA PRODUK ===================== */
 
-/* =====================================================================
-   ICON TAB  ->  EDIT DI SINI
-   ---------------------------------------------------------------------
-   Isi nama file .jpeg untuk icon bulat di setiap tab.
-   File diletakkan satu folder dengan file HTML ini.
-   Kalau file belum ada / dikosongkan (""), otomatis tampil lingkaran abu-abu.
-   ===================================================================== */
 const TAB_ICONS = {
-  MASTERJAM: "MASTERJAMICON.jpeg",   // tab: MASTERJAM Merch
-  MONARCH:   "MONARCHICON.jpeg",     // tab: MONARCH Merch
-  MJ:        "MJICON.jpeg",          // tab: MJ Collection
-  CHANDRA:   "CHANDRAICON.jpeg",     // tab: CHANDRA Collection
-  AKSA:      "AKSAICON.jpeg",        // tab: AKSA Collection
-  OETH:      "OETHICON.jpeg"         // tab: OETH Collection
+  MASTERJAM: "MASTERJAMICON.jpeg",
+  MONARCH:   "MONARCHICON.jpeg",
+  MJ:        "MJICON.jpeg",
+  CHANDRA:   "CHANDRAICON.jpeg",
+  AKSA:      "AKSAICON.jpeg",
+  OETH:      "OETHICON.jpeg"
 };
-/* ===================== AKHIR ICON TAB ===================== */
 
-/* helper: format harga & escape teks (supaya tanda kutip / < > di nama aman) */
 const rupiah = n => "Rp " + (Number(n) || 0).toLocaleString("id-ID");
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -569,13 +586,10 @@ const TABS = [
   {name:"OETH Collection", prefix:"OETH",      kind:"Collection", cats:["Albums","Photo sets","Posters","Limited","Bundles","Sale"]}
 ];
 let current = 0;
-
-/* urutan harga: null = urutan asli (All), "asc" = termurah dulu, "desc" = termahal dulu */
 let sortMode = null;
-
-/* pencarian: true = cari di semua tab, false = hanya di tab yang sedang aktif */
 const SEARCH_ALL_TABS = true;
 let searchQuery = "";
+
 function sortIdx(idxs, items){
   if(!sortMode) return idxs;
   return [...idxs].sort((a,b)=> sortMode==="asc"
@@ -597,17 +611,39 @@ TABS.forEach((t,i)=>{
   tabsEl.appendChild(b);
 });
 
-/* list = daftar index produk yang mau ditampilkan; data diambil dari PRODUCTS */
+const secondImg = f => String(f).replace(/(\.[A-Za-z0-9]+)$/, "_2$1");
+
+function imgFail(img){
+  const slide = img.closest(".slide");
+  if(!slide){ img.style.display = "none"; return; }
+  const slider = slide.parentElement;
+  if(slider.children.length < 2){ img.style.display = "none"; return; }
+  slide.remove();
+  const box = slider.parentElement;
+  if(slider.children.length < 2){
+    box.classList.remove("multi");
+    box.querySelectorAll(".nav,.lb-nav,.mdots").forEach(x=>x.remove());
+  }
+  if(slider.id === "lbSlider") syncSlider(slider);
+}
+
 function cards(list, tabIdx){
   const t = TABS[tabIdx];
   const items = PRODUCTS[t.prefix] || [];
   return list.filter(k => items[k]).map(k=>{
     const p = items[k];
     const img = p.img || (t.prefix + (k+1) + ".jpeg");
+    const img2 = secondImg(img);
     const sub = (p.subtitle !== undefined && p.subtitle !== null) ? p.subtitle : t.name;
     return `<div class="card" data-id="${tabIdx}-${k}" data-name="${esc(p.name)}" data-img="${esc(img)}" data-sub="${esc(sub)}" data-price="${Number(p.price) || 0}">
-      <div class="img-box">
-        <img src="${esc(img)}" alt="${esc(p.name)}" class="prod-img" onerror="this.style.display='none'">
+      <div class="img-box multi">
+        <div class="slider">
+          <div class="slide"><img src="${esc(img)}" alt="${esc(p.name)}" class="prod-img" draggable="false" onerror="imgFail(this)"></div>
+          <div class="slide"><img src="${esc(img2)}" alt="${esc(p.name)} 2" class="prod-img" draggable="false" loading="lazy" onerror="imgFail(this)"></div>
+        </div>
+        <button class="nav prev" data-nav="-1" aria-label="Previous photo">&#8249;</button>
+        <button class="nav next" data-nav="1" aria-label="Next photo">&#8250;</button>
+        <div class="mdots"><i class="active"></i><i></i></div>
       </div>
       <div><div class="name">${esc(p.name)}</div><div class="tag">${esc(sub)}</div></div>
       <div><span class="price">${rupiah(p.price)}</span></div>
@@ -616,7 +652,7 @@ function cards(list, tabIdx){
 }
 
 function select(i, focus, scroll){
-  current = i; const t = TABS[i];
+  current = i;
   [...tabsEl.querySelectorAll(".cat")].forEach((b,j)=>{
     b.setAttribute("aria-selected", j===i);
     b.tabIndex = j===i ? 0 : -1;
@@ -626,7 +662,6 @@ function select(i, focus, scroll){
   renderProducts();
 }
 
-/* render grid produk: mode normal (per tab) atau mode hasil pencarian */
 function renderProducts(){
   const secA = document.getElementById("secA"), secB = document.getElementById("secB");
   const gridA = document.getElementById("gridA"), gridB = document.getElementById("gridB");
@@ -681,7 +716,7 @@ searchInput.addEventListener("keydown", e=>{
 });
 select(0);
 
-/* ---- FILTER (urutkan harga) ---- */
+/* ---- FILTER ---- */
 const chipAll = document.getElementById("chipAll");
 const chipFilter = document.getElementById("chipFilter");
 const fMenu = document.getElementById("fMenu");
@@ -721,10 +756,11 @@ function vp(mode){
 }
 vpD.onclick=()=>vp("desktop"); vpM.onclick=()=>vp("mobile");
 
-/* ---- CART + USERNAME POPUP ---- */
+/* ---- CART + USERNAME POPUP LOGIC ---- */
 const $ = id => document.getElementById(id);
 const cart = [];
 let lastUser = "", pending = null, lastFocus = null, toastT;
+let currentLbCard = null; // Menyimpan referensi kartu produk yang sedang dipopup
 
 function toast(msg){
   const t = $("toast"); t.textContent = msg; t.classList.add("on");
@@ -803,7 +839,59 @@ function confirmUser(){
   addItem(pending, v);
 }
 
+/* ---- SLIDER FOTO PRODUK + POPUP ---- */
+function curIndex(s){ return Math.round(s.scrollLeft / (s.clientWidth || 1)); }
+function slideBy(s, dir){
+  const n = s.children.length;
+  if(n < 2) return;
+  const t = (curIndex(s) + dir + n) % n;
+  s.scrollTo({left: t * s.clientWidth, behavior: "smooth"});
+}
+function syncSlider(s){
+  const i = curIndex(s);
+  if(s.id === "lbSlider"){
+    $("lbCount").textContent = s.children.length > 1 ? (i+1) + " / " + s.children.length : "";
+  } else {
+    s.parentElement.querySelectorAll(".mdots i").forEach((d,j)=>d.classList.toggle("active", j===i));
+  }
+}
+document.addEventListener("scroll", e=>{
+  const s = e.target;
+  if(s && s.classList && s.classList.contains("slider")) syncSlider(s);
+}, true);
+
+function openLightbox(card, start){
+  currentLbCard = card; // Simpan kartu aktif
+  const srcs = [...card.querySelectorAll(".slider img")].map(im=>im.getAttribute("src"));
+  const s = $("lbSlider");
+  s.innerHTML = srcs.map(src=>`<div class="slide"><img src="${esc(src)}" alt="${esc(card.dataset.name)}" class="prod-img" draggable="false" onerror="imgFail(this)"></div>`).join("");
+  $("lbName").textContent = card.dataset.name;
+  $("lbPrice").textContent = rupiah(card.dataset.price); // FIX #2: Menampilkan harga produk di popup
+  document.querySelectorAll("#lbOv .lb-nav").forEach(b=>b.style.display = srcs.length>1 ? "" : "none");
+  lastFocus = card.querySelector(".img-box");
+  openOv("lbOv", $("lbClose"));
+  s.scrollTo({left: start * s.clientWidth, behavior: "instant"});
+  syncSlider(s);
+}
+$("lbClose").onclick = ()=>closeOv("lbOv");
+
+// FIX #1: Tombol Add to cart di popup memicu alur username X sama seperti di halaman utama
+$("lbAddToCart").onclick = ()=>{
+  if(!currentLbCard) return;
+  const card = currentLbCard;
+  closeOv("lbOv");
+  if(lastUser) addItem(itemFromCard(card), lastUser);
+  else openUser(card, $("lbAddToCart"));
+};
+
 document.addEventListener("click", e=>{
+  const nav = e.target.closest("[data-nav]");
+  if(nav){ slideBy(nav.parentElement.querySelector(".slider"), +nav.dataset.nav); return; }
+  const box = e.target.closest(".card .img-box");
+  if(box){
+    openLightbox(box.closest(".card"), curIndex(box.querySelector(".slider")));
+    return;
+  }
   const add = e.target.closest("[data-add]");
   if(add){
     const card = add.closest(".card");
@@ -832,8 +920,12 @@ $("uInput").addEventListener("input", ()=>{ $("uErr").textContent=""; $("uBox").
 $("cCheckout").onclick = ()=>{ coPrev = lastFocus; lastFocus = $("cCheckout"); openOv("coOv", $("coLink")); };
 $("coClose").onclick = ()=>closeOv("coOv");
 document.addEventListener("keydown", e=>{
+  const lb = $("lbOv").classList.contains("open");
+  if(lb && e.key==="ArrowRight"){ slideBy($("lbSlider"), 1); return; }
+  if(lb && e.key==="ArrowLeft"){ slideBy($("lbSlider"), -1); return; }
   if(e.key==="Escape"){
-    if($("coOv").classList.contains("open")) closeOv("coOv");
+    if(lb) closeOv("lbOv");
+    else if($("coOv").classList.contains("open")) closeOv("coOv");
     else if($("userOv").classList.contains("open")) closeOv("userOv");
     else if($("cartOv").classList.contains("open")) closeOv("cartOv");
   }
